@@ -87,9 +87,8 @@
             contentType: false,
             processData: false,
             success: function(response) {
-                $('#successToast').toast('show');
-                $('.error').remove();
-                console.log(response.success);
+                showToast('Updated post successfully');
+            $('.error').remove();
             },
             error: function(xhr, status, error) {
                 console.error(error);

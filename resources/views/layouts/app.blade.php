@@ -38,12 +38,6 @@
     </div>
 
     @include('layouts.footer.footer')
-
-    <script>
-        function closeToast() {
-            closeToast();
-        }
-    </script>
 </body>
 
 </html>
