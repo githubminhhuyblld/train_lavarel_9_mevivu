@@ -6,3 +6,6 @@ function showToast(message) {
     toastMessage.textContent = message;
     $('#successToast').toast('show');
 }
+function closeToast() {
+    $('#successToast').toast('hide');
+}

@@ -23,10 +23,31 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::where('status', 'ACTIVE')->get();
+        $posts = Post::where('status', Status::ACTIVE)
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('user.posts.index', compact('posts'));
     }
+
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search');
+
+        if ($searchTerm) {
+            $posts = Post::where(function ($query) use ($searchTerm) {
+                $query->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('id', $searchTerm);
+            })
+                ->whereNotIn('status', [Status::DELETED])
+                ->get();
+        } else {
+            $posts = Post::where('status', Status::ACTIVE)->get();
+        }
+
+        return view('user.posts.partials.post_list', compact('posts'));
+    }
+
 
     /**
      * Show the form for creating a new resource.

@@ -20,6 +20,7 @@ Route::group(['prefix' => 'posts'], function () {
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/publish', [PostController::class, 'publishPost'])->name('posts.publish');
     Route::post('/store', [PostController::class,'store'])->name('posts.store');
+    Route::get('/search', [PostController::class, 'search'])->name('posts.search');
     Route::get('/{id}', [PostController::class,'show'])->name('posts.show');
     Route::get('/{id}/edit', [PostController::class,'edit'])->name('posts.edit');
     Route::put('/{id}', [PostController::class,'update'])->name('posts.update');

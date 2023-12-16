@@ -6,6 +6,21 @@
 <div class=" mt-4">
     <a href="{{ route('posts.create') }}" class="btn btn-primary">Create a New Post</a>
 </div>
+<div class="row mt-4">
+    <div class="col-md-6 mx-auto">
+        <form id="searchForm">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search for a post">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="post-list">
     <table class="table table-hover">
         <thead>
@@ -15,35 +30,12 @@
                 <th scope="col">Excerpt</th>
                 <th scope="col">Create At</th>
                 <th scope="col">Post At</th>
+                <th scope="col">Status</th>
                 <th scope="col">Function</th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($posts as $post)
-            <tr>
-                <th scope="row">{{ $post->id }}</th>
-                <td>{{ $post->title }}</td>
-                <td>{{ $post->excerpt }}</td>
-                <td>{{ $post->created_at }}</td>
-                <td>
-                    @if(is_null($post->posted_at))
-                    Not Posted Yet
-                    @else
-                    {{ $post->posted_at }}
-                    @endif
-                </td>
-                <td>
-                    <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
-                    <button type="button" class="btn btn-danger btn-sm delete-post-button" data-post-id="{{ $post->id }}">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </button>
-
-                </td>
-
-            </tr>
-            @endforeach
+            @include('user.posts.partials.post_list', ['posts' => $posts])
         </tbody>
     </table>
 </div>
@@ -57,7 +49,32 @@
                 removePost(postId);
             }
         });
+
+        $('#searchButton').on('click', function() {
+            var searchTerm = $('#searchInput').val();
+            searchPosts(searchTerm);
+        });
     });
+
+    function searchPosts(searchTerm) {
+        $.ajax({
+            url: '/posts/search',
+            method: 'GET',
+            data: {
+                search: searchTerm
+            },
+            success: function(response) {
+                console.log(response);
+                updateTable(response);
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + error);
+            }
+        });
+    }
+    function updateTable(data) {
+    $('.post-list table tbody').html(data);
+}
 
     function removePost(postId) {
         $.ajax({
@@ -65,7 +82,7 @@
             method: 'DELETE',
             data: {
                 _token: '{{ csrf_token() }}',
-                id: postId  
+                id: postId
             },
             success: function(response) {
                 showToast('Post deleted successfully');
