@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Post;
 
-use App\Constants\Enum\Status;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\PostRequest;
 use App\Manager\Post\PostManager;
@@ -79,8 +78,6 @@ class PostController extends Controller
         }
     }
 
-
-
     /**
      * Display the specified resource.
      *
@@ -154,7 +151,7 @@ class PostController extends Controller
         if (!$post) {
             response()->json(['message' => 'Post Id: ' . $id . "Not Found"], 200);
         }
-        $this->postManager->updateAttribute($id, 'status', Status::DELETED);
+        $this->postManager->removePost($id);
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 }

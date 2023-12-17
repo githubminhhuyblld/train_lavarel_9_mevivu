@@ -52,4 +52,8 @@ class PostManager
         $this->updateAttribute($id, 'slug', $data->slug);
         $this->updateAttribute($id, 'image', $data->image);
     }
+
+    public function removePost($id){
+        $this->updateAttribute($id, 'status', Status::DELETED);
+    }
 }
