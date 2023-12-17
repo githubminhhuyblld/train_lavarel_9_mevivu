@@ -8,6 +8,7 @@ use App\Manager\Post\PostManager;
 use App\Models\Post\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Yajra\DataTables\DataTables;
 
 class PostController extends Controller
 {
@@ -24,8 +25,14 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = $this->postManager->getPosts();
-        return view('user.posts.index', compact('posts'));
+
+        return view('user.posts.index');
+    }
+    public function getPosts(DataTables $dataTables)
+    {
+        $query = Post::query()->where('status', '!=', 'DELETED');
+
+        return $dataTables->eloquent($query)->toJson();
     }
 
     public function search(Request $request)

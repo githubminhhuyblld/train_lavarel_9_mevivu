@@ -17,6 +17,7 @@ Route::get('/', [PostController::class,'index']);
 
 Route::group(['prefix' => 'posts'], function () {
     Route::get('/', [PostController::class,'index'])->name('posts.index');
+    Route::get('/data', [PostController::class, 'getPosts'])->name('posts.data');
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/publish', [PostController::class, 'publishPost'])->name('posts.publish');
     Route::post('/store', [PostController::class,'store'])->name('posts.store');
