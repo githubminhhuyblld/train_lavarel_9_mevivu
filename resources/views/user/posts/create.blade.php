@@ -52,6 +52,7 @@
     </div>
 </div>
 <script>
+    CKEDITOR.replace('content');
     function previewImage() {
         var input = document.getElementById('image');
         var output = document.getElementById('preview-image');
@@ -78,6 +79,9 @@
     function createPost(action) {
         $(".alert").remove();
         document.getElementById('publishInput').value = action;
+        if (CKEDITOR.instances.content) {
+            CKEDITOR.instances.content.updateElement();
+        }
         var formData = new FormData(document.getElementById('postForm'));
         // for (var pair of formData.entries()) {
         //     console.log(pair[0] + ': ' + pair[1]);

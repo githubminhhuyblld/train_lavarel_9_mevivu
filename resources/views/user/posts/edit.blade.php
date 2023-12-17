@@ -17,7 +17,7 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="{{ $post->title }}" >
+                            <input type="text" class="form-control" id="title" name="title" value="{{ $post->title }}">
                             <div id="titleError"></div>
                         </div>
                         <div class="mb-3">
@@ -51,16 +51,18 @@
 </div>
 
 <script>
+    CKEDITOR.replace('content');
+
     function resetFormData() {
-    $('#postForm').trigger("reset");
-    document.getElementById('title').value = ''; 
-    document.getElementById('slug').value = ''; 
-    document.getElementById('image').value = ''; 
-    document.getElementById('excerpt').value = ''; 
-    document.getElementById('content').value = ''; 
-    document.getElementById('preview-image').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png';
-    $('.error').remove();
-}
+        $('#postForm').trigger("reset");
+        document.getElementById('title').value = '';
+        document.getElementById('slug').value = '';
+        document.getElementById('image').value = '';
+        document.getElementById('excerpt').value = '';
+        document.getElementById('content').value = '';
+        document.getElementById('preview-image').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png';
+        $('.error').remove();
+    }
     document.getElementById('image').addEventListener('change', function(event) {
         var output = document.getElementById('preview-image');
         output.src = URL.createObjectURL(event.target.files[0]);
@@ -72,6 +74,9 @@
     function updatePost() {
         event.preventDefault();
         $(".alert").remove();
+        if (CKEDITOR.instances.content) {
+            CKEDITOR.instances.content.updateElement();
+        }
         var formData = new FormData(document.getElementById('postForm'));
         /**See log value */
         // for (var pair of formData.entries()) {
@@ -88,7 +93,7 @@
             processData: false,
             success: function(response) {
                 showToast('Updated post successfully');
-            $('.error').remove();
+                $('.error').remove();
             },
             error: function(xhr, status, error) {
                 console.error(error);
