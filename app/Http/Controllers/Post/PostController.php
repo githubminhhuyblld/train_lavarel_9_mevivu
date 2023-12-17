@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\Post;
 
 use App\Constants\Enum\Status;
-use App\Constants\Entity\BaseEntityManager;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Post\PostRequest;
+use App\Manager\Post\PostManager;
 use App\Models\Post\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
 class PostController extends Controller
 {
-    use BaseEntityManager;
-    protected function getModelClass(): string
+    private PostManager $postManager;
+
+    public function __construct(PostManager $postManager)
     {
-        return Post::class;
+        $this->postManager = $postManager;
     }
     /**
      * Display a listing of the resource.
@@ -23,10 +25,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::where('status', Status::ACTIVE)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
+        $posts = $this->postManager->getPosts();
         return view('user.posts.index', compact('posts'));
     }
 
@@ -35,14 +34,9 @@ class PostController extends Controller
         $searchTerm = $request->input('search');
 
         if ($searchTerm) {
-            $posts = Post::where(function ($query) use ($searchTerm) {
-                $query->where('title', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('id', $searchTerm);
-            })
-                ->whereNotIn('status', [Status::DELETED])
-                ->get();
+            $posts = $this->postManager->searchPost($searchTerm);
         } else {
-            $posts = Post::where('status', Status::ACTIVE)->get();
+            $posts = $this->postManager->getPosts();
         }
 
         return view('user.posts.partials.post_list', compact('posts'));
@@ -65,32 +59,26 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        $post = new Post();
-        $post->title = $validatedData['title'];
-        $post->content = $validatedData['content'];
-        $post->slug = $request['slug'];
-        $post->excerpt = $request['excerpt'];
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
-            $post->image = 'images/' . $imageName;
-        }
-        if ($request->input('publish') === "CREATE_PUBLISH") {
-            $post->posted_at = now();
-            $post->save();
+        $validatedData = $request->validated();
+        $data = [
+            'title' => $validatedData['title'],
+            'content' => $validatedData['content'],
+            'slug' => $request['slug'],
+            'excerpt' => $request['excerpt'],
+            'image' => $request->hasFile('image') ? 'images/' . time() . '.' . $request->image->extension() : null,
+            'publish' => $request->input('publish'),
+        ];
+
+        $post = $this->postManager->createPost($data);
+        if ($post->posted_at) {
             return response()->json(['message' => 'Created and published successfully'], 200);
         } else {
-            $post->save();
             return response()->json(['message' => 'Created successfully'], 200);
         }
     }
+
 
 
     /**
@@ -127,14 +115,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PostRequest $request, $id)
     {
-        $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
+        $validatedData = $request->validated();
         $post = Post::find($id);
 
         if (!$post) {
@@ -143,7 +126,7 @@ class PostController extends Controller
 
         $post->title = $validatedData['title'];
         $post->content = $validatedData['content'];
-        $post->slug = $request->input('title');
+        $post->slug = $request->input('slug');
         $post->excerpt = $request->input('excerpt');
 
         if ($request->hasFile('image')) {
@@ -155,7 +138,7 @@ class PostController extends Controller
             $request->image->move(public_path('images'), $imageName);
             $post->image = 'images/' . $imageName;
         }
-        $post->save();
+        $this->postManager->update($id, $post);
         return response()->json(['message' => 'Updated successfully'], 200);
     }
 
@@ -171,7 +154,7 @@ class PostController extends Controller
         if (!$post) {
             response()->json(['message' => 'Post Id: ' . $id . "Not Found"], 200);
         }
-        $this->updateAttribute($id, 'status', Status::DELETED);
+        $this->postManager->updateAttribute($id, 'status', Status::DELETED);
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 }

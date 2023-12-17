@@ -97,7 +97,6 @@
             },
             error: function(xhr, status, error) {
                 console.error(error);
-
                 if (xhr.responseJSON && xhr.responseJSON.errors) {
                     var errors = xhr.responseJSON.errors;
                     for (var key in errors) {
