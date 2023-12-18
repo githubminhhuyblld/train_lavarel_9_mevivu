@@ -37,7 +37,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Image</label></br />
-                            <img class="post-image" id="preview-image" src="@if($post->image){{ asset($post->image) }}@else{{ 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png' }}@endif" alt="Post Image" class="img-fluid mb-2">
+                            <img class="post-image" id="preview-image" src="@if($post->image){{ asset('storage/' . $post->image) }}@else{{ 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png' }}@endif" alt="Post Image" class="img-fluid mb-2">
                             <input type="file" class="form-control" id="image" name="image">
                             <div id="imageError"></div>
                         </div>
