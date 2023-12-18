@@ -13,27 +13,27 @@
                     <a class="btn btn-secondary" href="{{ route('posts.index') }}">Back</a>
                 </div>
                 <div class="card-body">
-                    <form id="postForm" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+                    <form data-parsley-validate id="postForm" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title">
+                            <input type="text" class="form-control" id="title" name="title" required data-parsley-trigger="keyup" data-parsley-minlength="3" data-parsley-maxlength="255">
                             <div id="titleError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="slug" class="form-label">Slug</label>
-                            <input type="text" class="form-control" id="slug" name="slug">
+                            <input type="text" class="form-control" id="slug" name="slug" required data-parsley-trigger="keyup">
                             <div id="slugError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="excerpt" class="form-label">Excerpt</label>
-                            <input type="text" class="form-control" id="excerpt" name="excerpt">
+                            <input type="text" class="form-control" id="excerpt" name="excerpt" required data-parsley-trigger="keyup">
                             <div id="excerptError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="content" class="form-label">Content</label>
-                            <textarea class="form-control" id="content" name="content" rows="5"></textarea>
-                            <div id="contentError"></div>
+                            <textarea class="form-control" id="content" name="content" rows="5" required data-parsley-trigger="keyup" data-parsley-minlength="3"></textarea>
+                            <div id="contentError" class="parsley-errors-list"></div>
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Image</label><br />
@@ -51,8 +51,25 @@
         </div>
     </div>
 </div>
-<script>
+<script type="text/javascript">
+    /**Ckeditor */
     CKEDITOR.replace('content');
+    CKEDITOR.instances.content.on('change', function() {
+        $('#content').val(CKEDITOR.instances.content.getData());
+
+        $('#content').parsley().validate();
+    });
+    CKEDITOR.instances.content.on('change', function() {
+
+        var errorMessage = $('#content').parsley().getErrorsMessages();
+        if (errorMessage.length > 0) {
+            $('#contentError').html(errorMessage[0]);
+        } else {
+            $('#contentError').empty();
+        }
+    });
+
+    /**Preview Image */
     function previewImage() {
         var input = document.getElementById('image');
         var output = document.getElementById('preview-image');
@@ -68,49 +85,70 @@
         }
     }
 
+    /**Reset Data */
     function resetFormData() {
         $('#postForm').trigger("reset");
+        CKEDITOR.instances.content.setData('');
         document.getElementById('publishInput').value = '';
         document.getElementById('image').value = '';
+        document.getElementById('content').value = '';
         document.getElementById('preview-image').src = 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png';
         $('.error').remove();
     }
+    /**Validate */
+    $(document).ready(function() {
+        $('#postForm').parsley({
+            errorsContainer: function(parsleyField) {
+                return parsleyField.$element.closest('.form-group');
+            },
+            errorsWrapper: '<div class="parsley-errors-list"></div>',
+            errorTemplate: '<div></div>'
+        }).on('field:validated', function(parsleyField) {
+            if (parsleyField.validationResult === true) {
+                parsleyField.$element.removeClass('input-error');
+            } else {
+                parsleyField.$element.addClass('input-error');
+            }
+        });
+    });
+
 
     function createPost(action) {
         $(".alert").remove();
         document.getElementById('publishInput').value = action;
-        if (CKEDITOR.instances.content) {
-            CKEDITOR.instances.content.updateElement();
-        }
+        $('#content').val(CKEDITOR.instances.content.getData());
         var formData = new FormData(document.getElementById('postForm'));
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0] + ': ' + pair[1]);
-        // }
-        $.ajax({
-            url: "{{ route('posts.store') }}",
-            method: "POST",
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                action === "CREATE" ? showToast('created post successfully') :
-                    showToast('created and publish post successfully');
-                $('.error').remove();
-                document.getElementById('publishInput').value = '';
-                console.log(response);
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    var errors = xhr.responseJSON.errors;
-                    for (var key in errors) {
-                        if (errors.hasOwnProperty(key)) {
-                            $("#" + key + "Error").html('<p class="error">' + errors[key][0] + '</p>');
+        for (var pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+        if ($('#postForm').parsley().validate()) {
+            console.log('success');
+            $.ajax({
+                url: "{{ route('posts.store') }}",
+                method: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    action === "CREATE" ? showToast('created post successfully') :
+                        showToast('created and publish post successfully');
+                    $('.error').remove();
+                    document.getElementById('publishInput').value = '';
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        var errors = xhr.responseJSON.errors;
+                        for (var key in errors) {
+                            if (errors.hasOwnProperty(key)) {
+                                $("#" + key + "Error").html('<p class="error">' + errors[key][0] + '</p>');
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 </script>
 @endsection

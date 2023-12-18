@@ -17,23 +17,23 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="{{ $post->title }}">
+                            <input type="text" class="form-control" id="title" name="title" value="{{ $post->title }}" required data-parsley-trigger="keyup" data-parsley-minlength="3" data-parsley-maxlength="255">
                             <div id="titleError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="slug" class="form-label">Slug</label>
-                            <input type="text" class="form-control" id="slug" name="slug" value="{{ $post->slug }}">
+                            <input type="text" class="form-control" id="slug" name="slug" value="{{ $post->slug }}" required data-parsley-trigger="keyup" data-parsley-minlength="3" data-parsley-maxlength="255">
                             <div id="slugError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="excerpt" class="form-label">Excerpt</label>
-                            <input type="text" class="form-control" id="excerpt" name="excerpt" value="{{ $post->excerpt }}">
+                            <input type="text" class="form-control" id="excerpt" name="excerpt" value="{{ $post->excerpt }}" required data-parsley-trigger="keyup" data-parsley-minlength="3" data-parsley-maxlength="255">
                             <div id="excerptError"></div>
                         </div>
                         <div class="mb-3">
                             <label for="content" class="form-label">Content</label>
                             <textarea class="form-control" id="content" name="content" rows="5">{{ $post->content }}</textarea>
-                            <div id="contentError"></div>
+                            <div id="contentError" class="parsley-errors-list"></div>
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Image</label></br />
@@ -51,10 +51,45 @@
 </div>
 
 <script>
+    /**Ckeditor */
     CKEDITOR.replace('content');
+    CKEDITOR.instances.content.on('change', function() {
+        $('#content').val(CKEDITOR.instances.content.getData());
 
+        $('#content').parsley().validate();
+    });
+    CKEDITOR.instances.content.on('change', function() {
+
+        var errorMessage = $('#content').parsley().getErrorsMessages();
+        if (errorMessage.length > 0) {
+            $('#contentError').html(errorMessage[0]);
+        } else {
+            $('#contentError').empty();
+        }
+    });
+
+
+    /**Validate */
+    $(document).ready(function() {
+        $('#postForm').parsley({
+            errorsContainer: function(parsleyField) {
+                return parsleyField.$element.closest('.form-group');
+            },
+            errorsWrapper: '<div class="parsley-errors-list"></div>',
+            errorTemplate: '<div></div>'
+        }).on('field:validated', function(parsleyField) {
+            if (parsleyField.validationResult === true) {
+                parsleyField.$element.removeClass('input-error');
+            } else {
+                parsleyField.$element.addClass('input-error');
+            }
+        });
+    });
+
+    /**Reset form */
     function resetFormData() {
         $('#postForm').trigger("reset");
+        CKEDITOR.instances.content.setData('');
         document.getElementById('title').value = '';
         document.getElementById('slug').value = '';
         document.getElementById('image').value = '';
@@ -71,6 +106,7 @@
         }
     });
 
+    /**Update post */
     function updatePost() {
         event.preventDefault();
         $(".alert").remove();
@@ -78,36 +114,35 @@
             CKEDITOR.instances.content.updateElement();
         }
         var formData = new FormData(document.getElementById('postForm'));
-        /**See log value */
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0] + ': ' + pair[1]);
-        // }
-        $.ajax({
-            url: "{{ route('posts.update', ['id' => $post->id]) }}",
-            method: "POST",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                showToast('Updated post successfully');
-                $('.error').remove();
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
+        if ($('#postForm').parsley().validate()) {
+            $.ajax({
+                url: "{{ route('posts.update', ['id' => $post->id]) }}",
+                method: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    showToast('Updated post successfully');
+                    $('.error').remove();
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
 
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    var errors = xhr.responseJSON.errors;
-                    for (var key in errors) {
-                        if (errors.hasOwnProperty(key)) {
-                            $("#" + key + "Error").html('<p class="error">' + errors[key][0] + '</p>');
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        var errors = xhr.responseJSON.errors;
+                        for (var key in errors) {
+                            if (errors.hasOwnProperty(key)) {
+                                $("#" + key + "Error").html('<p class="error">' + errors[key][0] + '</p>');
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
+
     }
 </script>
 @endsection

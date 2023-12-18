@@ -57,3 +57,18 @@ body {
     border-color: #007bff; 
     outline: none; 
 }
+
+.input-error:focus ,.input-error {
+    border: 1px solid red;
+	outline: none; 
+	box-shadow: none;
+}
+
+
+.parsley-errors-list {
+    color: red; 
+    font-size: 0.875em; 
+    margin-top: 5px;
+    list-style-type: none; 
+    padding: 0; 
+}
