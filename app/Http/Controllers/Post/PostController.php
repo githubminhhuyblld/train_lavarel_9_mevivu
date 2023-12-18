@@ -59,6 +59,15 @@ class PostController extends Controller
         return view("user.posts.create");
     }
 
+    public function createImage($request){
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            return 'images/' . $imageName;
+        }
+        return null;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -68,12 +77,13 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         $validatedData = $request->validated();
+      
         $data = [
             'title' => $validatedData['title'],
             'content' => $validatedData['content'],
             'slug' => $request['slug'],
             'excerpt' => $request['excerpt'],
-            'image' => $request->hasFile('image') ? 'images/' . time() . '.' . $request->image->extension() : null,
+            'image' => $this ->createImage($request),
             'publish' => $request->input('publish'),
         ];
 
