@@ -65,11 +65,23 @@ class PostController extends Controller
             $image = $request->file('image');
             $imageName = time() . '.' . $image->extension();
             $path = $image->storeAs('images', $imageName, 'public');
-    
-            return $path; 
+
+            return $path;
         }
-    
+
         return null;
+    }
+
+    public function updateImage(Post $post, $image)
+    {
+        if ($image && File::exists(public_path($post->image))) {
+            File::delete(public_path($post->image));
+        }
+
+        $imageFile = request()->file('image');
+        $imageName = time() . '.' . $imageFile->extension();
+        $imageFile->storeAs('images', $imageName, 'public');
+        return 'images/' . $imageName;
     }
     /**
      * Store a newly created resource in storage.
@@ -145,15 +157,8 @@ class PostController extends Controller
         $post->content = $validatedData['content'];
         $post->slug = $request->input('slug');
         $post->excerpt = $request->input('excerpt');
-
         if ($request->hasFile('image')) {
-            $oldImagePath = public_path($post->image);
-            if ($post->image && File::exists($oldImagePath)) {
-                File::delete($oldImagePath);
-            }
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
-            $post->image = 'images/' . $imageName;
+            $post->image =  $this->updateImage($post, $request->file('image'));
         }
         $this->postManager->update($id, $post);
         return response()->json(['message' => 'Updated successfully'], 200);
