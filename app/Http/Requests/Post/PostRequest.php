@@ -26,7 +26,15 @@ class PostRequest extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'sometimes|custom_image_validation',
+
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'image.custom_image_validation' => 'Must be an image file',
         ];
     }
 }

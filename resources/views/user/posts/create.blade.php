@@ -35,12 +35,15 @@
                             <textarea class="form-control" id="content" name="content" rows="5" required data-parsley-trigger="keyup" data-parsley-minlength="3"></textarea>
                             <div id="contentError" class="parsley-errors-list"></div>
                         </div>
+
                         <div class="mb-3">
                             <label for="image" class="form-label">Image</label><br />
                             <img class="post-image" id="preview-image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png" alt="Product Image" class="img-fluid mb-2">
-                            <input type="file" class="form-control" id="image" name="image" onchange="previewImage()">
+                            <input type="text" class="form-control" id="image" name="image" readonly>
+                            <button type="button" class="btn btn-info" onclick="openCKFinder()">Select Image</button>
                             <div id="imageError"></div>
                         </div>
+
                         <button type="button" class="btn btn-warning" onclick="resetFormData()">Reset</button>
                         <button type="button" class="btn btn-primary ml-4" onclick="createPost('CREATE')">Create</button>
                         <button type="button" class="btn btn-success ml-4" onclick="createPost('CREATE_PUBLISH')">Create And Publish</button>
@@ -52,6 +55,7 @@
     </div>
 </div>
 <script type="text/javascript">
+    
     /**Ckeditor */
     CKEDITOR.replace('content');
     CKEDITOR.instances.content.on('change', function() {
@@ -68,22 +72,6 @@
             $('#contentError').empty();
         }
     });
-
-    /**Preview Image */
-    function previewImage() {
-        var input = document.getElementById('image');
-        var output = document.getElementById('preview-image');
-
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                output.src = e.target.result;
-            }
-
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
 
     /**Reset Data */
     function resetFormData() {
@@ -117,18 +105,24 @@
         $(".alert").remove();
         document.getElementById('publishInput').value = action;
         $('#content').val(CKEDITOR.instances.content.getData());
-        var formData = new FormData(document.getElementById('postForm'));
-        for (var pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
+        var postData = {
+            title: $('#title').val(),
+            content: $('#content').val(),
+            slug: $('#slug').val(),
+            excerpt: $('#excerpt').val(),
+            image: $('#image').val(),
+            publish: action
+        };
         if ($('#postForm').parsley().validate()) {
             console.log('success');
             $.ajax({
                 url: "{{ route('posts.store') }}",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
                 method: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
+                data: JSON.stringify(postData),
+                contentType: "application/json",
                 success: function(response) {
                     action === "CREATE" ? showToast('created post successfully') :
                         showToast('created and publish post successfully');

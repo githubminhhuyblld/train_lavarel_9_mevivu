@@ -98,7 +98,7 @@ class PostController extends Controller
             'content' => $validatedData['content'],
             'slug' => $request['slug'],
             'excerpt' => $request['excerpt'],
-            'image' => $this->createImage($request),
+            'image' => $request['image'],
             'publish' => $request->input('publish'),
         ];
 
@@ -157,8 +157,8 @@ class PostController extends Controller
         $post->content = $validatedData['content'];
         $post->slug = $request->input('slug');
         $post->excerpt = $request->input('excerpt');
-        if ($request->hasFile('image')) {
-            $post->image =  $this->updateImage($post, $request->file('image'));
+        if ($request->input('image') != $post->image) {
+            $post->image = $request->input('image');
         }
         $this->postManager->update($id, $post);
         return response()->json(['message' => 'Updated successfully'], 200);

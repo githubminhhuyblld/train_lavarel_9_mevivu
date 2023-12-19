@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
     <title>@yield('title')</title>
     <!-- Bootstrap CSS -->
@@ -30,12 +32,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+    <!-- ckfinder -->
+    <script type="text/javascript" src="/js/ckfinder/ckfinder.js"></script>
+    <script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
+
     <script src="{{url('assets/common.js') }}"></script>
 
 </head>
 
 <body>
     @include('layouts.header.header')
+    @include('ckfinder::setup')
     <div class="container">
         @yield('content')
     </div>
