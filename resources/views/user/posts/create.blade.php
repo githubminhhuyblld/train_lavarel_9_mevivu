@@ -44,6 +44,14 @@
                             <div id="imageError"></div>
                         </div>
 
+                        <div class="mb-3">
+                            <label for="is_featured" class="form-label">Post Type</label>
+                            <select class="form-select" id="is_featured" name="is_featured">
+                                <option value="NORMAL">NORMAL</option>
+                                <option value="FEATURED">FEATURED</option>
+                            </select>
+                        </div>
+
                         <button type="button" class="btn btn-warning" onclick="resetFormData()">Reset</button>
                         <button type="button" class="btn btn-primary ml-4" onclick="createPost('CREATE')">Create</button>
                         <button type="button" class="btn btn-success ml-4" onclick="createPost('CREATE_PUBLISH')">Create And Publish</button>
@@ -55,7 +63,6 @@
     </div>
 </div>
 <script type="text/javascript">
-    
     /**Ckeditor */
     CKEDITOR.replace('content');
     CKEDITOR.instances.content.on('change', function() {
@@ -111,6 +118,7 @@
             slug: $('#slug').val(),
             excerpt: $('#excerpt').val(),
             image: $('#image').val(),
+            is_featured:$('#is_featured').val(),
             publish: action
         };
         if ($('#postForm').parsley().validate()) {

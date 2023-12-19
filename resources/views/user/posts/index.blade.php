@@ -24,6 +24,7 @@
 
 <script>
 var table; 
+var currentPage = 1;
 $(document).ready(function() {
     table = $('.table').DataTable({
         processing: true,
@@ -62,7 +63,8 @@ $(document).ready(function() {
     });
     $('.table tbody').on('click', '.delete-post-button', function() {
         var postId = $(this).data('post-id');
-        
+        currentPage = table.page.info().page + 1;
+
         if (confirm('Are you sure you want to delete this post?')) {
             $.ajax({
                 url: "/posts/" + postId, 
@@ -71,7 +73,8 @@ $(document).ready(function() {
                     '_token': "{{ csrf_token() }}",
                 },
                 success: function(result) {
-                    table.ajax.reload();
+                    table.row($(this).closest('tr')).remove().draw(false);
+                    table.page(currentPage - 1).draw('page');
                     showToast(result.message);
                 },
                 error: function(xhr) {

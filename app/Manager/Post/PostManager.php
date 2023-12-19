@@ -30,6 +30,7 @@ class PostManager
             'slug' => $data['slug'],
             'excerpt' => $data['excerpt'],
             'image' => $data['image'],
+            'is_featured' => $data['is_featured'],
             'posted_at' => $data['publish'] === "CREATE_PUBLISH" ? now() : null,
         ]);
     }
@@ -51,6 +52,7 @@ class PostManager
         $this->updateAttribute($id, 'excerpt', $data->excerpt);
         $this->updateAttribute($id, 'slug', $data->slug);
         $this->updateAttribute($id, 'image', $data->image);
+        $this->updateAttribute($id, 'is_featured', $data->is_featured);
     }
 
     public function removePost($id){

@@ -42,6 +42,13 @@
                             <button type="button" class="btn btn-info" onclick="openCKFinder()">Select Image</button>
                             <div id="imageError"></div>
                         </div>
+                        <div class="mb-3">
+                            <label for="is_featured" class="form-label">Post Type</label>
+                            <select class="form-select" id="is_featured" name="is_featured">
+                                <option value="NORMAL" @if ($post->is_featured == 'NORMAL') selected @endif>NORMAL</option>
+                                <option value="FEATURED" @if ($post->is_featured == 'FEATURED') selected @endif>FEATURED</option>
+                            </select>
+                        </div>
 
                         <button type="button" class="btn btn-warning" onclick="resetFormData()">Reset</button>
                         <button type="button" onclick="updatePost()" class="btn btn-primary">Update</button>

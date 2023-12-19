@@ -99,6 +99,7 @@ class PostController extends Controller
             'slug' => $request['slug'],
             'excerpt' => $request['excerpt'],
             'image' => $request['image'],
+            'is_featured' => $request['is_featured'],
             'publish' => $request->input('publish'),
         ];
 
@@ -157,6 +158,7 @@ class PostController extends Controller
         $post->content = $validatedData['content'];
         $post->slug = $request->input('slug');
         $post->excerpt = $request->input('excerpt');
+        $post->is_featured = $request->input('is_featured');
         if ($request->input('image') != $post->image) {
             $post->image = $request->input('image');
         }
