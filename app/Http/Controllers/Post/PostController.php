@@ -30,7 +30,8 @@ class PostController extends Controller
     }
     public function getPosts(DataTables $dataTables)
     {
-        $query = Post::query()->where('status', '!=', 'DELETED');
+        $query = Post::query()->where('status', '!=', 'DELETED')
+            ->orderBy('created_at', 'desc');
 
         return $dataTables->eloquent($query)->toJson();
     }
