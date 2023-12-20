@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Post;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostRequest extends FormRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,17 +24,10 @@ class PostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'image' => 'sometimes|custom_image_validation',
-
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'image.custom_image_validation' => 'Must be an image file',
+            'email' => 'required|email:rfc,dns|unique:users,email',
+            'username' => 'required|unique:users,username',
+            'password' => 'required|min:8',
+            'password_confirmation' => 'required|same:password'
         ];
     }
 }

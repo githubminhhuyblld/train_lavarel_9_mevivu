@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Post\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,9 +15,31 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+/** Auth */
+Route::group(['middleware' => ['guest']], function() {
+
+    /**
+     * Register Routes
+     */
+    Route::get('/register',[RegisterController::class,'show'])->name('register.show');
+
+    /**
+     * Login Routes
+     */
+    Route::get('/login',  [LoginController::class,'show'])->name('login.show');
+
+
+});
+
+
+
+
+
+
 Route::get('/', [PostController::class,'index']);
 
 Route::group(['prefix' => 'posts'], function () {
+
     Route::get('/', [PostController::class,'index'])->name('posts.index');
     Route::get('/data', [PostController::class, 'getPosts'])->name('posts.data');
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');

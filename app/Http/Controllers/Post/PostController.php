@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\PostRequest;
 use App\Manager\Post\PostManager;
 use App\Models\Post\Post;
-use Illuminate\Support\Facades\File;
+use Illuminate\Http\JsonResponse;
 use Yajra\DataTables\DataTables;
+use Illuminate\View\View;
 
 class PostController extends Controller
 {
@@ -17,17 +18,19 @@ class PostController extends Controller
     {
         $this->postManager = $postManager;
     }
+
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
 
         return view('user.posts.index');
     }
-    public function getPosts(DataTables $dataTables)
+
+    public function getPosts(DataTables $dataTables): JsonResponse
     {
         $query = Post::query()
             ->where('status', '!=', 'DELETED');
@@ -52,49 +55,24 @@ class PostController extends Controller
         return $dataTables->eloquent($query)->toJson();
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         return view("user.posts.create");
     }
 
-    public function createImage($request)
-    {
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->extension();
-            $path = $image->storeAs('images', $imageName, 'public');
-
-            return $path;
-        }
-
-        return null;
-    }
-
-    public function updateImage(Post $post, $image)
-    {
-        if ($image && File::exists(public_path($post->image))) {
-            File::delete(public_path($post->image));
-        }
-
-        $imageFile = request()->file('image');
-        $imageName = time() . '.' . $imageFile->extension();
-        $imageFile->storeAs('images', $imageName, 'public');
-        return 'images/' . $imageName;
-    }
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param PostRequest $request
+     *
+     * @return JsonResponse
      */
-    public function store(PostRequest $request)
+    public function store(PostRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
@@ -119,21 +97,20 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
      */
-    public function show($id)
+    public function show(int $id)
     {
-        return "Post detail";
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     *
+     * @return View
      */
-    public function edit($id)
+    public function edit(int $id):View
     {
         $post = Post::find($id);
 
@@ -143,14 +120,16 @@ class PostController extends Controller
 
         return view("user.posts.edit", compact('post'));
     }
+
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param PostRequest $request
+     * @param int $id
+     *
+     * @return JsonResponse
      */
-    public function update(PostRequest $request, $id)
+    public function update(PostRequest $request, int $id)
     {
         $validatedData = $request->validated();
         $post = Post::find($id);
@@ -174,10 +153,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     *
+     * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id):JsonResponse
     {
         $post = Post::find($id);
         if (!$post) {
