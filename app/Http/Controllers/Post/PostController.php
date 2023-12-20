@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\PostRequest;
 use App\Manager\Post\PostManager;
 use App\Models\Post\Post;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Yajra\DataTables\DataTables;
 
