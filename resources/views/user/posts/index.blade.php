@@ -6,6 +6,21 @@
 <div class=" mt-4">
     <a href="{{ route('posts.create') }}" class="btn btn-primary">Create a New Post</a>
 </div>
+<div class="filter-container mt-4">
+    <div class="row">
+        <div class="col-md-4">
+            <input type="text" id="searchTitle" class="form-control" placeholder="Search by Title">
+        </div>
+        <div class="col-md-4">
+            <input type="text" id="excerpt" class="form-control" placeholder="Search by Excerpt">
+        </div>
+        <div class="col-md-4">
+            <button id="searchButton" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</div>
+
+
 <div class="post-list">
     <table class="table table-hover">
         <thead>
@@ -23,33 +38,53 @@
 </div>
 
 <script>
-var table; 
-var currentPage = 1;
-$(document).ready(function() {
-    table = $('.table').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "{{ route('posts.data') }}",
-        columns: [
-            { data: 'id', name: 'id' },
-            { data: 'title', name: 'title' },
-            { data: 'excerpt', name: 'excerpt' },
-            { data: 'created_at', name: 'created_at' },
-            {
-                data: 'posted_at',
-                name: 'posted_at',
-                render: function(data, type, row) {
-                    if (data === null) {
-                        return 'Not Posted Yet'; 
-                    } else {
-                        return data;
-                    }
+    var table;
+    var currentPage = 1;
+    $(document).ready(function() {
+        table = $('.table').DataTable({
+            processing: true,
+            serverSide: true,
+            bFilter: false,
+            ajax: {
+                url: "{{ route('posts.data') }}",
+                data: function(d) {
+                    d.title = $('#searchTitle').val();
+                    d.excerpt = $('#excerpt').val();
                 }
             },
-            { data: 'status', name: 'status' },
-        ],
-        columnDefs: [
-            {
+            columns: [{
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'title',
+                    name: 'title'
+                },
+                {
+                    data: 'excerpt',
+                    name: 'excerpt'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'posted_at',
+                    name: 'posted_at',
+                    render: function(data, type, row) {
+                        if (data === null) {
+                            return 'Not Posted Yet';
+                        } else {
+                            return data;
+                        }
+                    }
+                },
+                {
+                    data: 'status',
+                    name: 'status'
+                },
+            ],
+            columnDefs: [{
                 targets: 6,
                 render: function(data, type, row) {
                     return `<a href="/posts/${row.id}/edit" class="btn btn-primary btn-sm">  
@@ -58,33 +93,36 @@ $(document).ready(function() {
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>`;
                 }
-            }
-        ]
-    });
-    $('.table tbody').on('click', '.delete-post-button', function() {
-        var postId = $(this).data('post-id');
-        currentPage = table.page.info().page + 1;
+            }]
+        });
+        $('#searchButton').on('click', function() {
+            table.draw();
+        });
 
-        if (confirm('Are you sure you want to delete this post?')) {
-            $.ajax({
-                url: "/posts/" + postId, 
-                type: 'DELETE',
-                data: {
-                    '_token': "{{ csrf_token() }}",
-                },
-                success: function(result) {
-                    table.row($(this).closest('tr')).remove().draw(false);
-                    table.page(currentPage - 1).draw('page');
-                    showToast(result.message);
-                },
-                error: function(xhr) {
-                    var errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while deleting the post.';
-                    alert(errorMsg);
-                }
-            });
-        }
+        $('.table tbody').on('click', '.delete-post-button', function() {
+            var postId = $(this).data('post-id');
+            currentPage = table.page.info().page + 1;
+
+            if (confirm('Are you sure you want to delete this post?')) {
+                $.ajax({
+                    url: "/posts/" + postId,
+                    type: 'DELETE',
+                    data: {
+                        '_token': "{{ csrf_token() }}",
+                    },
+                    success: function(result) {
+                        table.row($(this).closest('tr')).remove().draw(false);
+                        table.page(currentPage - 1).draw('page');
+                        showToast(result.message);
+                    },
+                    error: function(xhr) {
+                        var errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while deleting the post.';
+                        alert(errorMsg);
+                    }
+                });
+            }
+        });
     });
-});
 </script>
 
 </script>

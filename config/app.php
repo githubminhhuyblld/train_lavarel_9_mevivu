@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://localhost:8080'),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -180,6 +180,9 @@ return [
         App\Providers\RouteServiceProvider::class,
         /**Data table */
         Yajra\DataTables\DataTablesServiceProvider::class,
+
+        /**debugger */
+        Barryvdh\Debugbar\ServiceProvider::class,
 
     ],
 

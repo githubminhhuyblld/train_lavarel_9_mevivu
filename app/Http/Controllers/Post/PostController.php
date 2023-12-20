@@ -30,24 +30,29 @@ class PostController extends Controller
     }
     public function getPosts(DataTables $dataTables)
     {
-        $query = Post::query()->where('status', '!=', 'DELETED')
-            ->orderBy('created_at', 'desc');
+        $query = Post::query()
+            ->where('status', '!=', 'DELETED');
+
+        if (request()->has('title')) {
+            $query->where('title', 'like', '%' . request('title') . '%');
+        }
+
+        if (request()->has('excerpt')) {
+            $query->where('excerpt', 'like', '%' . request('excerpt') . '%');
+        }
+
+        if (request()->has('title') && request()->has('excerpt')) {
+            $query->where(function ($query) {
+                $query->where('title', 'like', '%' . request('title') . '%')
+                    ->orWhere('excerpt', 'like', '%' . request('excerpt') . '%');
+            });
+        }
+
+        $query->orderBy('created_at', 'desc');
 
         return $dataTables->eloquent($query)->toJson();
     }
 
-    public function search(Request $request)
-    {
-        $searchTerm = $request->input('search');
-
-        if ($searchTerm) {
-            $posts = $this->postManager->searchPost($searchTerm);
-        } else {
-            $posts = $this->postManager->getPosts();
-        }
-
-        return view('user.posts.partials.post_list', compact('posts'));
-    }
 
 
     /**
