@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Post;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\PostRequest;
 use App\Manager\Post\PostManager;
-use App\Models\Post\Post;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Yajra\DataTables\DataTables;
 use Illuminate\View\View;
 
@@ -32,24 +32,12 @@ class PostController extends Controller
 
     public function getPosts(DataTables $dataTables): JsonResponse
     {
-        $query = Post::query()
-            ->where('status', '!=', 'DELETED');
+        $searchCriteria = [
+            'title' => request('title'),
+            'excerpt' => request('excerpt'),
 
-        if (request()->has('title')) {
-            $query->where('title', 'like', '%' . request('title') . '%');
-        }
-
-        if (request()->has('excerpt')) {
-            $query->where('excerpt', 'like', '%' . request('excerpt') . '%');
-        }
-
-        if (request()->has('title') && request()->has('excerpt')) {
-            $query->where(function ($query) {
-                $query->where('title', 'like', '%' . request('title') . '%')
-                    ->orWhere('excerpt', 'like', '%' . request('excerpt') . '%');
-            });
-        }
-
+        ];
+        $query = $this->postManager->searchQuery($searchCriteria);
         $query->orderBy('created_at', 'desc');
 
         return $dataTables->eloquent($query)->toJson();
@@ -108,11 +96,11 @@ class PostController extends Controller
      *
      * @param int $id
      *
-     * @return View
+     * @return  View
      */
-    public function edit(int $id):View
+    public function edit(int $id): View
     {
-        $post = Post::find($id);
+        $post = $this->postManager->findById($id);
 
         if (!$post) {
             return redirect()->route('posts.index')->with('error', 'Post not found.');
@@ -127,12 +115,12 @@ class PostController extends Controller
      * @param PostRequest $request
      * @param int $id
      *
-     * @return JsonResponse
+     * @return JsonResponse | RedirectResponse
      */
-    public function update(PostRequest $request, int $id)
+    public function update(PostRequest $request, int $id): JsonResponse|RedirectResponse
     {
         $validatedData = $request->validated();
-        $post = Post::find($id);
+        $post = $this->postManager->findById($id);
 
         if (!$post) {
             return redirect()->route('posts.index')->with('error', 'Post not found.');
@@ -157,13 +145,13 @@ class PostController extends Controller
      *
      * @return JsonResponse
      */
-    public function destroy(int $id):JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $post = Post::find($id);
+        $post = $this->postManager->findById($id);
         if (!$post) {
-            response()->json(['message' => 'Post Id: ' . $id . "Not Found"], 200);
+            response()->json(['message' => 'Post Id: ' . $id . "Not Found"], 404);
         }
-        $this->postManager->removePost($id);
+        $this->postManager->remove($id);
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 }
