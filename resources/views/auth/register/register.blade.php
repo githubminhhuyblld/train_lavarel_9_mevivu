@@ -10,9 +10,8 @@
                     <div class="card-header">Register Page</div>
 
                     <div class="card-body">
-                        <form method="POST" action="">
+                        <form id="registerForm" method="POST" action="{{ route('register.perform') }}">
                             @csrf
-
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>
                                 <input type="text" class="form-control" id="name" name="name"  required autofocus>
@@ -40,4 +39,23 @@
             </div>
         </div>
     </div>
+    <script>
+        $('#registerForm').on('submit', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '{{ route('register.perform') }}',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    showToast("Register successfully !")
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+    </script>
 @endsection

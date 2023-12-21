@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'home')
+@section('title', 'Posts')
 
 @section('content')
 <div class=" mt-4">
@@ -87,7 +87,7 @@
             columnDefs: [{
                 targets: 6,
                 render: function(data, type, row) {
-                    return `<a href="/posts/${row.id}/edit" class="btn btn-primary btn-sm">  
+                    return `<a href="/posts/${row.id}/edit" class="btn btn-primary btn-sm">
                                 <i class="fas fa-edit"></i> Edit</a>
                             <button class="btn btn-danger btn-sm delete-post-button" data-post-id="${row.id}">
                                 <i class="fas fa-trash-alt"></i> Delete

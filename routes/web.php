@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Post\PostController;
+use App\Http\Controllers\Home\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,37 +16,42 @@ use Illuminate\Support\Facades\Route;
 |
 */
 /** Auth */
-Route::group(['middleware' => ['guest']], function() {
+Route::group(['middleware' => ['guest']], function () {
 
     /**
      * Register Routes
      */
-    Route::get('/register',[RegisterController::class,'show'])->name('register.show');
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.perform');
 
     /**
      * Login Routes
      */
-    Route::get('/login',  [LoginController::class,'show'])->name('login.show');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.perform');
 
-
+    /**
+     * Logout Route
+     */
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
 
+/**
+ * Home Route
+ */
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
+Route::get('/', [PostController::class, 'index'])->name('posts.index')->middleware('auth');
 
-
-
-Route::get('/', [PostController::class,'index']);
-
-Route::group(['prefix' => 'posts'], function () {
-
-    Route::get('/', [PostController::class,'index'])->name('posts.index');
+Route::group(['prefix' => 'posts', 'middleware' => 'auth'], function () {
+    Route::get('/', [PostController::class, 'index'])->name('posts.index');
     Route::get('/data', [PostController::class, 'getPosts'])->name('posts.data');
     Route::get('/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/store', [PostController::class,'store'])->name('posts.store');
-    Route::get('/{id}', [PostController::class,'show'])->name('posts.show');
-    Route::get('/{id}/edit', [PostController::class,'edit'])->name('posts.edit');
-    Route::put('/{id}', [PostController::class,'update'])->name('posts.update');
-    Route::delete('/{id}', [PostController::class,'destroy'])->name('posts.destroy');
-
+    Route::post('/store', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/{id}', [PostController::class, 'show'])->name('posts.show');
+    Route::get('/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    Route::put('/{id}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
+

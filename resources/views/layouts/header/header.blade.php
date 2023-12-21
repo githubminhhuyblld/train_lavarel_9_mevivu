@@ -8,7 +8,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{route("home")}}">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">About</a>
@@ -21,15 +21,33 @@
                     </li>
                 </ul>
 
-                <!-- Login and Register -->
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login.show') }}">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link"  href="{{ route('register.show') }}">Register</a>
-                    </li>
+                    @auth
+                        <li class="nav-item">
+                            <span class="nav-link">Hello, {{ auth()->user()->name }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <form action="{{ route('logout') }}" method="POST" style="display: none;" id="logout-form">
+                                @csrf
+                            </form>
+                            <a href="#" class="btn btn-outline-light me-2" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Logout
+                            </a>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Register</a>
+                        </li>
+                    @endauth
                 </ul>
+
+
+
+
+
 
             </div>
         </div>
