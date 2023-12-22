@@ -12,7 +12,7 @@ class CategoriesTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         Category::factory()->count(10)->create();
     }

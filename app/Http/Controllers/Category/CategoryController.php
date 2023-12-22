@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\Category;
 
-use App\Constants\Enum\Status;
 use App\Http\Controllers\Controller;
 use App\Manager\Category\CategoryManager;
 use App\Models\Category\Category;
-use App\Models\Post\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\View\View;
 use Yajra\DataTables\DataTables;
 
@@ -34,7 +31,12 @@ class CategoryController extends Controller
 
     public function getData(DataTables $dataTables): JsonResponse
     {
-        $query = $this->categoryManager->getActiveCategoriesQuery();
+        $searchCriteria = [
+            'id' => request('id'),
+            'title' => request('name'),
+
+        ];
+        $query = $this->categoryManager->searchQuery($searchCriteria);
 
         return $dataTables->eloquent($query)->toJson();
     }
@@ -103,12 +105,20 @@ class CategoryController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $post = Category::find($id);
-        if (!$post) {
+        $category = $this ->categoryManager->findById($id);
+        if (!$category) {
             response()->json(['message' => 'Category Id: ' . $id . "Not Found"], 404);
         }
         $this->categoryManager->remove($id);
 
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
+
+    public function massDelete(Request $request): JsonResponse
+    {
+        $ids = $request->ids;
+        $this -> categoryManager ->removeByIds($ids);
+        return response()->json(['message' => 'Deleted successfully'], 200);
+    }
+
 }

@@ -65,6 +65,18 @@ trait BaseEntityManager
         $this->updateAttribute($id, 'status', 'DELETED');
     }
 
+    /**
+     * Remove multiple entities by their IDs.
+     *
+     * @param array $ids The IDs of the model instances to be removed.
+     */
+    public function removeByIds(array $ids): void
+    {
+        foreach ($ids as $id) {
+           $this ->remove($id);
+        }
+    }
+
 
     /**
      * Search for model instances based on an array of criteria.

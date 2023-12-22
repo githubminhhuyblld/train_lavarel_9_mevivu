@@ -9,6 +9,17 @@ function showToast(message) {
         hideAfter: 3500,
     });
 }
+function showToastWarning(message) {
+    $.toast({
+        heading: "Warning",
+        text: message,
+        position: "top-right",
+        loaderBg: "#ff6849",
+        icon: "warning",
+        hideAfter: 3500,
+    });
+}
+
 function closeToast() {
     $("#successToast").toast("hide");
 }

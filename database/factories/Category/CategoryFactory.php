@@ -22,7 +22,7 @@ class CategoryFactory extends Factory
         return [
             'name' => $this->faker->words(2, true),
             'slug' => $this->faker->slug,
-            'status' => $this->faker->randomElement([Status::ACTIVE, Status::INACTIVE, Status::DELETED]),
+            'status' => $this->faker->randomElement([Status::ACTIVE]),
         ];
     }
 }

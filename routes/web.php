@@ -51,9 +51,15 @@ Route::get('/', [PostController::class, 'index'])->name('posts.index')->middlewa
 Route::group(['prefix' => 'categories', 'middleware' => 'auth'], function () {
     Route::get('/', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('/data', [CategoryController::class, 'getData'])->name('categories.data');
+    Route::delete('/{id}', [PostController::class, 'destroy'])->name('categories.destroy');
+    Route::post('/mass-delete', [CategoryController::class, 'massDelete'])->name('categories.massDelete');
+
 
 });
 
+/**
+ * Posts Route
+ */
 Route::group(['prefix' => 'posts', 'middleware' => 'auth'], function () {
     Route::get('/', [PostController::class, 'index'])->name('posts.index');
     Route::get('/data', [PostController::class, 'getPosts'])->name('posts.data');
@@ -63,5 +69,6 @@ Route::group(['prefix' => 'posts', 'middleware' => 'auth'], function () {
     Route::get('/{id}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/{id}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/{id}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::post('/mass-delete', [PostController::class, 'massDelete'])->name('posts.massDelete');
 });
 

@@ -7,6 +7,7 @@ use App\Http\Requests\Post\PostRequest;
 use App\Manager\Post\PostManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\View\View;
 
@@ -152,6 +153,13 @@ class PostController extends Controller
             response()->json(['message' => 'Post Id: ' . $id . "Not Found"], 404);
         }
         $this->postManager->remove($id);
+        return response()->json(['message' => 'Deleted successfully'], 200);
+    }
+
+    public function massDelete(Request $request): JsonResponse
+    {
+        $ids = $request->ids;
+        $this -> postManager ->removeByIds($ids);
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 }
