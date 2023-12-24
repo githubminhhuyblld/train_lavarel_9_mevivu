@@ -27,6 +27,8 @@ class PostRequest extends FormRequest
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'image' => 'sometimes|custom_image_validation',
+            'category_id' => 'required|array',
+            'category_id.*' => 'exists:categories,id',
 
         ];
     }

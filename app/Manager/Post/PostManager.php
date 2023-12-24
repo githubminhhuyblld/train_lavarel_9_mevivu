@@ -39,7 +39,7 @@ class PostManager
 
     public function createPost(array $data)
     {
-        return Post::create([
+        $post = Post::create([
             'title' => $data['title'],
             'content' => $data['content'],
             'slug' => $data['slug'],
@@ -48,7 +48,14 @@ class PostManager
             'is_featured' => $data['is_featured'],
             'posted_at' => $data['publish'] === "CREATE_PUBLISH" ? now() : null,
         ]);
+
+        if (!empty($data['category_id'])) {
+            $post->categories()->attach($data['category_id']);
+        }
+
+        return $post;
     }
+
     public function update($id, $data): void
     {
         $this->updateAttribute($id, 'title', $data->title);

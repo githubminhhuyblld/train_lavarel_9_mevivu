@@ -37,7 +37,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Image</label><br />
-                            <img class="post-image" id="preview-image" src="@if($post->image){{ $post->image }}@else{{ 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png' }}@endif" alt="Post Image" class="img-fluid mb-2">
+                            <img class="post-image img-fluid mb-2" id="preview-image" src="@if($post->image){{ $post->image }}@else{{ 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/1024px-No_image_available.svg.png' }}@endif" alt="Post Image" >
                             <input type="text" class="form-control" id="image" name="image" readonly>
                             <button type="button" class="btn btn-info" onclick="openCKFinder()">Select Image</button>
                             <div id="imageError"></div>
@@ -47,6 +47,17 @@
                             <select class="form-select" id="is_featured" name="is_featured">
                                 <option value="NORMAL" @if ($post->is_featured == 'NORMAL') selected @endif>NORMAL</option>
                                 <option value="FEATURED" @if ($post->is_featured == 'FEATURED') selected @endif>FEATURED</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Categories</label>
+                            <select class="form-select" id="category_id" name="category_id" multiple data-parsley-required="true">
+                                @foreach($categories as $categoryId => $categoryName)
+                                    <option value="{{ $categoryId }}"
+                                            @if(in_array($categoryId, $post->categories->pluck('id')->toArray())) selected @endif>{{ $categoryName }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -60,6 +71,9 @@
 </div>
 
 <script>
+    /** Select 2 */
+    $('#category_id').select2();
+
     /**Ckeditor */
     CKEDITOR.replace('content');
     CKEDITOR.instances.content.on('change', function() {
@@ -122,17 +136,25 @@
         if (CKEDITOR.instances.content) {
             CKEDITOR.instances.content.updateElement();
         }
-        var formData = new FormData(document.getElementById('postForm'));
+        const postData = {
+            title: $('#title').val(),
+            content: $('#content').val(),
+            slug: $('#slug').val(),
+            excerpt: $('#excerpt').val(),
+            image: $('#image').val(),
+            is_featured: $('#is_featured').val(),
+            category_id: $('#category_id').val(),
+        };
+        console.log(postData);
         if ($('#postForm').parsley().validate()) {
             $.ajax({
                 url: "{{ route('posts.update', ['id' => $post->id]) }}",
-                method: "POST",
+                method: "PUT",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                data: formData,
-                contentType: false,
-                processData: false,
+                data: JSON.stringify(postData),
+                contentType: "application/json",
                 success: function(response) {
                     showToast('Updated post successfully');
                     $('.error').remove();

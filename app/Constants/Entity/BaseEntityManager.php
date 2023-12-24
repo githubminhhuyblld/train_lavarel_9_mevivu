@@ -25,6 +25,15 @@ trait BaseEntityManager
     }
 
     /**
+     * Find all active instances of a model.
+     */
+    public function findAll()
+    {
+        $modelClass = $this->getModelClass();
+        return $modelClass::where('status', Status::ACTIVE)->get();
+    }
+
+    /**
      * Update a specific attribute of a model.
      *
      * @param mixed $id The ID of the model instance to be updated.

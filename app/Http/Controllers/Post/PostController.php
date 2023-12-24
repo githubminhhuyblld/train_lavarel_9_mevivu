@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\PostRequest;
+use App\Manager\Category\CategoryManager;
 use App\Manager\Post\PostManager;
+use App\Models\Category\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,9 +17,12 @@ class PostController extends Controller
 {
     private PostManager $postManager;
 
-    public function __construct(PostManager $postManager)
+    private CategoryManager $categoryManager;
+
+    public function __construct(PostManager $postManager,CategoryManager $categoryManager)
     {
         $this->postManager = $postManager;
+        $this->categoryManager = $categoryManager;
     }
 
     /**
@@ -51,7 +56,8 @@ class PostController extends Controller
      */
     public function create(): View
     {
-        return view("user.posts.create");
+        $categories = $this ->categoryManager->findAll();
+        return view("user.posts.create", compact('categories'));
     }
 
     /**
@@ -68,20 +74,22 @@ class PostController extends Controller
         $data = [
             'title' => $validatedData['title'],
             'content' => $validatedData['content'],
-            'slug' => $request['slug'],
-            'excerpt' => $request['excerpt'],
-            'image' => $request['image'],
-            'is_featured' => $request['is_featured'],
+            'slug' => $request->input('slug'),
+            'excerpt' => $request->input('excerpt'),
+            'image' => $validatedData['image'],
+            'is_featured' => $request->input('is_featured'),
             'publish' => $request->input('publish'),
+            'category_id' => $validatedData['category_id'],
         ];
-
         $post = $this->postManager->createPost($data);
+
         if ($post->posted_at) {
             return response()->json(['message' => 'Created and published successfully'], 200);
         } else {
             return response()->json(['message' => 'Created successfully'], 200);
         }
     }
+
 
     /**
      * Display the specified resource.
@@ -106,8 +114,9 @@ class PostController extends Controller
         if (!$post) {
             return redirect()->route('posts.index')->with('error', 'Post not found.');
         }
+        $categories = Category::pluck('name', 'id');
 
-        return view("user.posts.edit", compact('post'));
+        return view("user.posts.edit", compact('post','categories'));
     }
 
     /**
@@ -135,6 +144,8 @@ class PostController extends Controller
         if ($request->input('image') != $post->image) {
             $post->image = $request->input('image');
         }
+        $post->categories()->sync($request->input('category_id'));
+
         $this->postManager->update($id, $post);
         return response()->json(['message' => 'Updated successfully'], 200);
     }
