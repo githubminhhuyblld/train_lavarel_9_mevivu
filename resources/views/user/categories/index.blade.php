@@ -5,6 +5,7 @@
 @section('content')
     <div class=" mt-4">
         <a href="{{ route('posts.index') }}" class="btn btn-primary">Back</a>
+        <a href="{{ route('categories.create') }}" class="btn btn-primary">Create a New Category</a>
 
     </div>
     <div class="filter-container mt-4">

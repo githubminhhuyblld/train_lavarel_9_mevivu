@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Category;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Category\CategoryRequest;
 use App\Manager\Category\CategoryManager;
-use App\Models\Category\Category;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -44,11 +44,11 @@ class CategoryController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view("user.categories.create");
     }
 
     /**
@@ -57,9 +57,16 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request): JsonResponse
     {
-        //
+        $validatedData = $request->validated();
+
+        $data = [
+            'name' => $validatedData['name'],
+            'slug' => $validatedData['slug'],
+        ];
+         $this->categoryManager->create($data);
+        return response()->json(['message' => 'Created successfully'], 200);
     }
 
     /**
