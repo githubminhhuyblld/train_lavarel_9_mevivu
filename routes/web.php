@@ -53,6 +53,8 @@ Route::group(['prefix' => 'categories', 'middleware' => 'auth'], function () {
     Route::get('/data', [CategoryController::class, 'getData'])->name('categories.data');
     Route::get('/create', [CategoryController::class, 'create'])->name('categories.create');
     Route::post('/store', [CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/{id}/edit', [CategoryController::class, 'edit'])->name('posts.edit');
+    Route::put('/{id}', [CategoryController::class, 'update'])->name('categories.update');
     Route::delete('/{id}', [PostController::class, 'destroy'])->name('categories.destroy');
     Route::post('/mass-delete', [CategoryController::class, 'massDelete'])->name('categories.massDelete');
 

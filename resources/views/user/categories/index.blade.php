@@ -74,8 +74,8 @@
                 columnDefs: [{
                     targets: columns.length,
                     render: function (data, type, row) {
-                        return `<a class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Edit</a> `;
+                        return`<a href="/categories/${row.id}/edit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Edit</a>`;
 
                     }
                 }]

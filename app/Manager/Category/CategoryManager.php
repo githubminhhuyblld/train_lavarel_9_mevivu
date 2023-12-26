@@ -28,6 +28,12 @@ class CategoryManager
             ->orderBy('created_at', 'desc');
     }
 
+    public function update($id, $data): void
+    {
+        $this->updateAttribute($id, 'name', $data->name);
+        $this->updateAttribute($id, 'slug', $data->slug);
+    }
+
 
 
 }

@@ -24,7 +24,7 @@ class CategoryController extends Controller
      *
      * @return View
      */
-    public function index():View
+    public function index(): View
     {
         return view('user.categories.index');
     }
@@ -54,7 +54,7 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(CategoryRequest $request): JsonResponse
@@ -65,14 +65,14 @@ class CategoryController extends Controller
             'name' => $validatedData['name'],
             'slug' => $validatedData['slug'],
         ];
-         $this->categoryManager->create($data);
+        $this->categoryManager->create($data);
         return response()->json(['message' => 'Created successfully'], 200);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($id)
@@ -83,24 +83,40 @@ class CategoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id): View
     {
-        //
+        $category = $this->categoryManager->findById($id);
+
+        if (!$category) {
+            return redirect()->route('posts.index')->with('error', 'Post not found.');
+        }
+
+        return view("user.categories.edit", compact('category'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, int $id): JsonResponse
     {
-        //
+        $validatedData = $request->validated();
+        $category = $this->categoryManager->findById($id);
+
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Post not found.');
+        }
+
+        $category->name = $validatedData['name'];
+        $category->slug = $validatedData['slug'];
+        $this->categoryManager->update($id, $category);
+        return response()->json(['message' => 'Updated successfully'], 200);
     }
 
     /**
@@ -112,7 +128,7 @@ class CategoryController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $category = $this ->categoryManager->findById($id);
+        $category = $this->categoryManager->findById($id);
         if (!$category) {
             response()->json(['message' => 'Category Id: ' . $id . "Not Found"], 404);
         }
@@ -124,7 +140,7 @@ class CategoryController extends Controller
     public function massDelete(Request $request): JsonResponse
     {
         $ids = $request->ids;
-        $this -> categoryManager ->removeByIds($ids);
+        $this->categoryManager->removeByIds($ids);
         return response()->json(['message' => 'Deleted successfully'], 200);
     }
 
