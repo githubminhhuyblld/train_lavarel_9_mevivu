@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <form data-parsley-validate
                               id="postForm"
-                              action="{{ route('menus.store') }}"
+                              action="{{ route('menus.storeMenuItem') }}"
                               method="POST"
                               enctype="multipart/form-data">
                             @csrf
@@ -54,7 +54,7 @@
             };
             if ($('#postForm').parsley().validate()) {
                 $.ajax({
-                    url: "{{ route('menus.store') }}",
+                    url: "{{ route('menus.storeMenuItem') }}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },

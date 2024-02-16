@@ -22,18 +22,21 @@
                                 Chọn tất cả
                             </label>
                         </div>
-                        @foreach ($menuItems as $menuItem)
-                            <div class="form-check">
-                                <input class="form-check-input menu-item-checkbox" type="checkbox"
-                                       value="{{ $menuItem->id }}"
-                                       id="menuItemCheckbox{{ $menuItem->id }}" data-title="{{ $menuItem->title }}"
-                                    {{ $menuItem->status === 1 ? 'checked' : '' }}>
-                                <label class="form-check-label" for="menuItemCheckbox{{ $menuItem->id }}">
-                                    {{ $menuItem->title }}
-                                </label>
-                            </div>
-                        @endforeach
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            @foreach ($menuItems as $menuItem)
+                                <div class="form-check">
+                                    <input class="form-check-input menu-item-checkbox" type="checkbox"
+                                           value="{{ $menuItem->id }}"
+                                           id="menuItemCheckbox{{ $menuItem->id }}" data-title="{{ $menuItem->title }}"
+                                        {{ $menuItem->status === 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="menuItemCheckbox{{ $menuItem->id }}">
+                                        {{ $menuItem->title }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
+
 
                     <div class="col col-lg-7">
                         <div id="selectedMenuList" class="list-group">
@@ -46,10 +49,23 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="col col-lg-12 d-flex align-items-center ">
+                    <div class="col col-lg-12 mt-4 pd-4 d-flex align-items-center ">
                         <span style="margin-right: 12px">Chọn Background</span>
-                        <input class="pl-4" type="color" id="background-color-picker" name="background" value="">
+                        <input class="pl-4" type="color" id="background-color-picker" name="background" value={{$menu->background}}>
                     </div>
+                    <div class="col mt-4 col-lg-12 d-flex align-items-center ">
+                        <span style="margin-right: 12px">Chọn Color</span>
+                        <input class="pl-4" type="color" id="menu_color" name="menu_color" value={{$menu->menu_color}}>
+                    </div>
+                    <div class="col col-lg-12 d-flex align-items-center mt-3">
+                        <label for="menu_font" style="margin-right: 12px">Chọn Font Size:</label>
+                        <div class="d-flex align-items-center">
+                            <input type="number" id="menu_font" name="menu_font" class="form-control" value={{$menu->menu_font}} min="10" max="36" style="width: 80px;">
+                            <span class="ms-2">pt</span>
+                        </div>
+                    </div>
+
+
 
                 </div>
             </div>
@@ -122,7 +138,9 @@
 
             $('#menuSelectionForm').on('submit', function (e) {
                 e.preventDefault();
-
+                let backgroundColor = $('#background-color-picker').val();
+                let menuFont = $('#menu_font').val();
+                let menuColor = $('#menu_color').val();
                 let checkedItemsCount = $('.menu-item-checkbox:checked').length;
                 if (checkedItemsCount === 0) {
                     showToastWarning('Vui lòng chọn ít nhất một menu.');
@@ -133,7 +151,7 @@
                 }
 
                 $('#selectedMenuList .list-group-item').each(function (index, element) {
-                    sortMenu.push({ id: $(element).data('id'), position: index + 1 });
+                    sortMenu.push({id: $(element).data('id'), position: index + 1});
                 });
 
                 $.ajax({
@@ -141,6 +159,9 @@
                     type: 'POST',
                     data: {
                         menu: sortMenu,
+                        background: backgroundColor,
+                        menu_font: menuFont,
+                        menu_color: menuColor,
                         _token: '{{ csrf_token() }}'
                     },
                     success: function (response) {

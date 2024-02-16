@@ -24,8 +24,9 @@ class MenuController extends Controller
     public function index(): View
     {
         $menuItems = $this->menuItemManager->getOrderBy();
+        $menu = $this->menuManager->findById(1);
 
-        return view('user.menu.index', compact('menuItems'));
+        return view('user.menu.index', compact('menuItems', 'menu'));
     }
 
     public function create(): View
@@ -36,19 +37,25 @@ class MenuController extends Controller
 
     public function updateMenu(Request $request): JsonResponse
     {
-        $order = $request->input('menu');
-        $menuItemIds = array_column($order, 'id');
-        foreach ($order as $menuData) {
+        $menu = $request->input('menu');
+        $backgroundColor = $request->input('background');
+        $menuFont = $request->input('menu_font');
+        $menuColor = $request->input('menu_color');
+        $this->menuManager->updateAttribute(1, 'background', $backgroundColor);
+        $this->menuManager->updateAttribute(1,'menu_font',$menuFont );
+        $this->menuManager->updateAttribute(1,'menu_color',$menuColor );
+        $menuItemIds = array_column($menu, 'id');
+        foreach ($menu as $menuData) {
             $menuItem = $this->menuItemManager->findById($menuData['id']);
             if ($menuItem) {
-                $this->menuItemManager->updateAttribute( $menuItem->id, 'order',  $menuData['position']);
-                $this->menuItemManager->updateAttribute( $menuItem->id, 'status',  1);
+                $this->menuItemManager->updateAttribute($menuItem->id, 'order', $menuData['position']);
+                $this->menuItemManager->updateAttribute($menuItem->id, 'status', 1);
             }
         }
         $allMenuItems = $this->menuItemManager->getAll();
         foreach ($allMenuItems as $menuItem) {
             if (!in_array($menuItem->id, $menuItemIds)) {
-                $this->menuItemManager->updateAttribute( $menuItem->id, 'status',  2);
+                $this->menuItemManager->updateAttribute($menuItem->id, 'status', 2);
 
             }
         }

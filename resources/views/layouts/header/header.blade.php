@@ -1,5 +1,5 @@
 <header>
-    <nav style="background-color: #e3f2fd;" class="navbar navbar-expand-lg navbar-light">
+    <nav style="background-color:{{ $backgroundColor }};" class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="#">Mevivu</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -10,8 +10,8 @@
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         @foreach($menuItems as $menuItem)
                             @if($menuItem->status == 1)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ url($menuItem->slug) }}">
+                                <li style="font-size: {{ $menuFont }}px;" class="nav-item">
+                                    <a style="color:{{$menuColor}}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ url($menuItem->slug) }}">
                                         {{ $menuItem->title }}
                                     </a>
                                 </li>
