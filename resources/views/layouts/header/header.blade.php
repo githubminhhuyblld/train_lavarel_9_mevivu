@@ -7,18 +7,17 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{route("home")}}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Info</a>
-                    </li>
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        @foreach($menuItems as $menuItem)
+                            @if($menuItem->status == 1)
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ url($menuItem->slug) }}">
+                                        {{ $menuItem->title }}
+                                    </a>
+                                </li>
+                            @endif
+                        @endforeach
+                    </ul>
                 </ul>
 
                 <ul class="navbar-nav ml-auto">
@@ -43,12 +42,6 @@
                         </li>
                     @endauth
                 </ul>
-
-
-
-
-
-
             </div>
         </div>
     </nav>

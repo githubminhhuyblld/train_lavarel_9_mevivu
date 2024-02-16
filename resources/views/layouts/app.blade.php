@@ -39,6 +39,8 @@
     <!-- ckfinder -->
     <script type="text/javascript" src="/js/ckfinder/ckfinder.js"></script>
     <script>CKFinder.config( { connectorPath: '/ckfinder/connector' } );</script>
+    <!-- sortable.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <script src="{{url('assets/common.js') }}"></script>
 

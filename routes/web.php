@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Menu\MenuController;
+use App\Http\Controllers\MenuItem\MenuItemController;
 use App\Http\Controllers\Post\PostController;
 use App\Http\Controllers\Home\HomeController;
 use App\Http\Controllers\Category\CategoryController;
@@ -44,6 +46,17 @@ Route::group(['middleware' => ['guest']], function () {
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('/', [PostController::class, 'index'])->name('posts.index')->middleware('auth');
+
+/**
+ * Menu Route
+ */
+Route::group(['prefix' => 'menus', 'middleware' => 'auth'], function () {
+    Route::get('/', [MenuController::class, 'index'])->name('menus.index');
+    Route::get('/create', [MenuController::class, 'create'])->name('menus.create');
+    Route::post('/store', [MenuController::class, 'store'])->name('menus.storeMenuItem');
+    Route::post('/menus/update-menu', [MenuController::class, 'updateMenu'])->name('menus.updateMenu');
+
+});
 
 /**
  * Categories Route

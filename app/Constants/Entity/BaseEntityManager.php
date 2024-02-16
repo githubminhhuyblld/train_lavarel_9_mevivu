@@ -32,6 +32,16 @@ trait BaseEntityManager
         $modelClass = $this->getModelClass();
         return $modelClass::where('status', Status::ACTIVE)->get();
     }
+    public function getOrderBy() {
+        $modelClass = $this->getModelClass();
+        return $modelClass::orderBy('order', 'asc')->get();
+    }
+
+    public function  getAll()
+    {
+        $modelClass = $this->getModelClass();
+        return $modelClass::where('status', 1)->get();
+    }
 
     /**
      * Update a specific attribute of a model.
