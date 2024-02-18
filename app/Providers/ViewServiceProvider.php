@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Manager\Menu\MenuManager;
+use App\Manager\MenuItem\MenuItemManager;
 use App\Models\Menu\Menu;
 use App\Models\Menu\MenuItem;
 use Illuminate\Support\ServiceProvider;
@@ -27,8 +29,10 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         View::composer('layouts.header.header', function ($view) {
-            $menuItems = MenuItem::where('status', 1)->get();
+            $menuItemManager = new MenuItemManager();
+            $menuItems = $menuItemManager->getOrderBy();
             $menu = Menu::first();
             $backgroundColor = $menu ? $menu->background : '#ccc';
             $menuColor = $menu ? $menu->menu_color : '#ccc';
