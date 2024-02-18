@@ -38,6 +38,7 @@ class ViewServiceProvider extends ServiceProvider
             $menuColor = $menu ? $menu->menu_color : '#ccc';
             $menuFont = $menu ? $menu->menu_font : '16';
             $view->with([
+
                 'menuItems' => $menuItems,
                 'backgroundColor' => $backgroundColor,
                 'menuFont' => $menuFont,
